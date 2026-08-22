@@ -22,6 +22,10 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include <stdio.h>
+#if defined(LOG_BACKEND_RTT)
+  #include "SEGGER_RTT.h"
+#endif
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -31,7 +35,13 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#if   defined(LOG_BACKEND_RTT)
+  #define LOG_BACKEND_NAME "SEGGER RTT"
+#elif defined(LOG_BACKEND_UART)
+  #define LOG_BACKEND_NAME "USART1 @ 115200"
+#else
+  #error "Choose backend: define LOG_BACKEND_RTT or LOG_BACKEND_UART"
+#endif
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -59,10 +69,13 @@ static void MX_USART1_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-/* printf() -> _write() -> __io_putchar() -> USART1 (PA9) */
 int __io_putchar(int ch)
 {
+#if defined(LOG_BACKEND_RTT)
+  SEGGER_RTT_PutChar(0, (char)ch);
+#else
   HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
+#endif
   return ch;
 }
 /* USER CODE END 0 */
@@ -102,15 +115,17 @@ int main(void)
   MX_ICACHE_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-  setvbuf(stdout, NULL, _IONBF, 0);   /* tắt buffer: printf ra ngay lập tức */
+#if defined(LOG_BACKEND_RTT)
+  SEGGER_RTT_Init();
+#endif
+  setvbuf(stdout, NULL, _IONBF, 0);
 
   printf("\r\n==========================================\r\n");
   printf("  Hello World from STM32H523CET6!\r\n");
+  printf("  Backend: %s\r\n", LOG_BACKEND_NAME);
   printf("  SYSCLK : %lu Hz\r\n", (unsigned long)HAL_RCC_GetSysClockFreq());
-  printf("  HCLK   : %lu Hz\r\n", (unsigned long)HAL_RCC_GetHCLKFreq());
   printf("  Build  : %s %s\r\n", __DATE__, __TIME__);
   printf("==========================================\r\n\n");
-
   uint32_t count = 0;
   /* USER CODE END 2 */
 
