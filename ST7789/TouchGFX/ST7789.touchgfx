@@ -15,7 +15,52 @@
           {
             "Type": "FlexButton",
             "Name": "flexButton1",
-            "Width": 240,
+            "Width": 120,
+            "Height": 120,
+            "ButtonTrigger": {
+              "Type": "ClickButtonTrigger"
+            },
+            "ButtonStyles": [
+              {
+                "Type": "BoxWithBorderButtonStyle",
+                "Height": 120,
+                "BorderSize": 5,
+                "ColorReleased": {
+                  "Green": 102,
+                  "Blue": 153
+                },
+                "ColorPressed": {
+                  "Green": 153,
+                  "Blue": 204
+                },
+                "ColorBorderReleased": {
+                  "Green": 51,
+                  "Blue": 102
+                },
+                "ColorBorderPressed": {
+                  "Red": 51,
+                  "Green": 102,
+                  "Blue": 153
+                }
+              }
+            ]
+          },
+          {
+            "Type": "ScalableImage",
+            "Name": "scalableImage2",
+            "X": 120,
+            "Y": 120,
+            "Width": 120,
+            "Height": 120,
+            "Filename": "anh2.png",
+            "ScalingAlgorithm": "Nearest-neighbor"
+          },
+          {
+            "Type": "FlexButton",
+            "Name": "flexButton2",
+            "X": 120,
+            "Y": 120,
+            "Width": 120,
             "Height": 120,
             "ButtonTrigger": {
               "Type": "ClickButtonTrigger"
@@ -55,11 +100,26 @@
             },
             "Action": {
               "Type": "ActionMove",
-              "X": 120,
               "Easing": "Linear",
               "EasingOption": "In",
               "Duration": 1000,
               "ActionComponent": "scalableImage1"
+            }
+          },
+          {
+            "InteractionName": "Interaction2",
+            "Trigger": {
+              "Type": "TriggerClicked",
+              "TriggerComponent": "flexButton2"
+            },
+            "Action": {
+              "Type": "ActionMove",
+              "X": 120,
+              "Y": 120,
+              "Easing": "Linear",
+              "EasingOption": "In",
+              "Duration": 1000,
+              "ActionComponent": "scalableImage2"
             }
           }
         ]

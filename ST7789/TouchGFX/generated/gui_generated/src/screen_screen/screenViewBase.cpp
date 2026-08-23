@@ -21,8 +21,20 @@ screenViewBase::screenViewBase() :
     flexButton1.setBorderSize(5);
     flexButton1.setBoxWithBorderColors(touchgfx::Color::getColorFromRGB(0, 102, 153), touchgfx::Color::getColorFromRGB(0, 153, 204), touchgfx::Color::getColorFromRGB(0, 51, 102), touchgfx::Color::getColorFromRGB(51, 102, 153));
     flexButton1.setAction(flexButtonCallback);
-    flexButton1.setPosition(0, 0, 240, 120);
+    flexButton1.setPosition(0, 0, 120, 120);
     add(flexButton1);
+
+    scalableImage2.setBitmap(touchgfx::Bitmap(BITMAP_ANH2_ID));
+    scalableImage2.setPosition(120, 120, 120, 120);
+    scalableImage2.setScalingAlgorithm(touchgfx::ScalableImage::NEAREST_NEIGHBOR);
+    add(scalableImage2);
+
+    flexButton2.setBoxWithBorderPosition(0, 0, 0, 120);
+    flexButton2.setBorderSize(5);
+    flexButton2.setBoxWithBorderColors(touchgfx::Color::getColorFromRGB(0, 102, 153), touchgfx::Color::getColorFromRGB(0, 153, 204), touchgfx::Color::getColorFromRGB(0, 51, 102), touchgfx::Color::getColorFromRGB(51, 102, 153));
+    flexButton2.setAction(flexButtonCallback);
+    flexButton2.setPosition(120, 120, 120, 120);
+    add(flexButton2);
 }
 
 screenViewBase::~screenViewBase()
@@ -41,8 +53,16 @@ void screenViewBase::flexButtonCallbackHandler(const touchgfx::AbstractButtonCon
     {
         //Interaction1
         //When flexButton1 clicked move scalableImage1
-        //Move scalableImage1 to x:120, y:0 with LinearIn easing in 1000 ms (60 Ticks)
+        //Move scalableImage1 to x:0, y:0 with LinearIn easing in 1000 ms (60 Ticks)
         scalableImage1.clearMoveAnimationEndedAction();
-        scalableImage1.startMoveAnimation(120, 0, 60, touchgfx::EasingEquations::linearEaseIn, touchgfx::EasingEquations::linearEaseIn);
+        scalableImage1.startMoveAnimation(0, 0, 60, touchgfx::EasingEquations::linearEaseIn, touchgfx::EasingEquations::linearEaseIn);
+    }
+    if (&src == &flexButton2)
+    {
+        //Interaction2
+        //When flexButton2 clicked move scalableImage2
+        //Move scalableImage2 to x:120, y:120 with LinearIn easing in 1000 ms (60 Ticks)
+        scalableImage2.clearMoveAnimationEndedAction();
+        scalableImage2.startMoveAnimation(120, 120, 60, touchgfx::EasingEquations::linearEaseIn, touchgfx::EasingEquations::linearEaseIn);
     }
 }

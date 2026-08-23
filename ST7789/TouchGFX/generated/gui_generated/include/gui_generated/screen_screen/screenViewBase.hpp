@@ -31,6 +31,8 @@ protected:
     touchgfx::Box __background;
     touchgfx::MoveAnimator< touchgfx::ScalableImage > scalableImage1;
     touchgfx::BoxWithBorderButtonStyle< touchgfx::ClickButtonTrigger >  flexButton1;
+    touchgfx::MoveAnimator< touchgfx::ScalableImage > scalableImage2;
+    touchgfx::BoxWithBorderButtonStyle< touchgfx::ClickButtonTrigger >  flexButton2;
 
 private:
 
