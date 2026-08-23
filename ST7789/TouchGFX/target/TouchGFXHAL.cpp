@@ -38,10 +38,8 @@ using namespace touchgfx;
  *  E.g. if using DMA to transfer the block, this could be called in the "Transfer Completed" interrupt handler.
  *
  */
-#warning "A user must call touchgfx::startNewTransfer(); once touchgfxDisplayDriverTransmitBlock() has succesfully sent a block."
-#warning "A user must implement C-methods touchgfxDisplayDriverTransmitActive() and touchgfxDisplayDriverTransmitBlock() used by the Partial Framebuffer Strategy."
 
-void TouchGFXHAL::initialize()
+ void TouchGFXHAL::initialize()
 {
     // Calling parent implementation of initialize().
     //
