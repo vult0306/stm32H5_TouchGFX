@@ -5,16 +5,24 @@
 #include <touchgfx/Color.hpp>
 #include <images/BitmapDatabase.hpp>
 
-screenViewBase::screenViewBase()
+screenViewBase::screenViewBase() :
+    flexButtonCallback(this, &screenViewBase::flexButtonCallbackHandler)
 {
     __background.setPosition(0, 0, 240, 240);
     __background.setColor(touchgfx::Color::getColorFromRGB(0, 0, 0));
     add(__background);
 
-    scalableImage1.setBitmap(touchgfx::Bitmap(BITMAP_VU_ID));
-    scalableImage1.setPosition(0, 0, 240, 240);
+    scalableImage1.setBitmap(touchgfx::Bitmap(BITMAP_ANH1_ID));
+    scalableImage1.setPosition(0, 0, 120, 120);
     scalableImage1.setScalingAlgorithm(touchgfx::ScalableImage::NEAREST_NEIGHBOR);
     add(scalableImage1);
+
+    flexButton1.setBoxWithBorderPosition(0, 0, 0, 120);
+    flexButton1.setBorderSize(5);
+    flexButton1.setBoxWithBorderColors(touchgfx::Color::getColorFromRGB(0, 102, 153), touchgfx::Color::getColorFromRGB(0, 153, 204), touchgfx::Color::getColorFromRGB(0, 51, 102), touchgfx::Color::getColorFromRGB(51, 102, 153));
+    flexButton1.setAction(flexButtonCallback);
+    flexButton1.setPosition(0, 0, 240, 120);
+    add(flexButton1);
 }
 
 screenViewBase::~screenViewBase()
@@ -25,4 +33,16 @@ screenViewBase::~screenViewBase()
 void screenViewBase::setupScreen()
 {
 
+}
+
+void screenViewBase::flexButtonCallbackHandler(const touchgfx::AbstractButtonContainer& src)
+{
+    if (&src == &flexButton1)
+    {
+        //Interaction1
+        //When flexButton1 clicked move scalableImage1
+        //Move scalableImage1 to x:120, y:0 with LinearIn easing in 1000 ms (60 Ticks)
+        scalableImage1.clearMoveAnimationEndedAction();
+        scalableImage1.startMoveAnimation(120, 0, 60, touchgfx::EasingEquations::linearEaseIn, touchgfx::EasingEquations::linearEaseIn);
+    }
 }

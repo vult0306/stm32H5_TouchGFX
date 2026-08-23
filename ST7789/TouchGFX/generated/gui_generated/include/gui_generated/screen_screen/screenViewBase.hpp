@@ -9,6 +9,9 @@
 #include <gui/screen_screen/screenPresenter.hpp>
 #include <touchgfx/widgets/Box.hpp>
 #include <touchgfx/widgets/ScalableImage.hpp>
+#include <touchgfx/containers/buttons/Buttons.hpp>
+#include <touchgfx/EasingEquations.hpp>
+#include <touchgfx/mixins/MoveAnimator.hpp>
 
 class screenViewBase : public touchgfx::View<screenPresenter>
 {
@@ -26,9 +29,20 @@ protected:
      * Member Declarations
      */
     touchgfx::Box __background;
-    touchgfx::ScalableImage scalableImage1;
+    touchgfx::MoveAnimator< touchgfx::ScalableImage > scalableImage1;
+    touchgfx::BoxWithBorderButtonStyle< touchgfx::ClickButtonTrigger >  flexButton1;
 
 private:
+
+    /*
+     * Callback Declarations
+     */
+    touchgfx::Callback<screenViewBase, const touchgfx::AbstractButtonContainer&> flexButtonCallback;
+
+    /*
+     * Callback Handler Declarations
+     */
+    void flexButtonCallbackHandler(const touchgfx::AbstractButtonContainer& src);
 
 };
 

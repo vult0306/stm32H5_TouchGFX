@@ -7,13 +7,62 @@
           {
             "Type": "ScalableImage",
             "Name": "scalableImage1",
-            "Width": 240,
-            "Height": 240,
-            "Filename": "vu.png",
+            "Width": 120,
+            "Height": 120,
+            "Filename": "anh1.png",
             "ScalingAlgorithm": "Nearest-neighbor"
+          },
+          {
+            "Type": "FlexButton",
+            "Name": "flexButton1",
+            "Width": 240,
+            "Height": 120,
+            "ButtonTrigger": {
+              "Type": "ClickButtonTrigger"
+            },
+            "ButtonStyles": [
+              {
+                "Type": "BoxWithBorderButtonStyle",
+                "Height": 120,
+                "BorderSize": 5,
+                "ColorReleased": {
+                  "Green": 102,
+                  "Blue": 153
+                },
+                "ColorPressed": {
+                  "Green": 153,
+                  "Blue": 204
+                },
+                "ColorBorderReleased": {
+                  "Green": 51,
+                  "Blue": 102
+                },
+                "ColorBorderPressed": {
+                  "Red": 51,
+                  "Green": 102,
+                  "Blue": 153
+                }
+              }
+            ]
           }
         ],
-        "Interactions": []
+        "Interactions": [
+          {
+            "InteractionName": "Interaction1",
+            "Trigger": {
+              "Type": "TriggerClicked",
+              "TriggerComponent": "flexButton1"
+            },
+            "Action": {
+              "Type": "ActionMove",
+              "X": 120,
+              "Easing": "Linear",
+              "EasingOption": "In",
+              "Duration": 1000,
+              "ActionComponent": "scalableImage1"
+            }
+          }
+        ]
       }
     ],
     "CustomContainerDefinitions": [],
