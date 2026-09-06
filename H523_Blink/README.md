@@ -1,12 +1,15 @@
 # H523_Blink
 
-Starter project for the **WeAct Studio STM32H523CET6** board, flashed and debugged with a **SEGGER J-Link**.
+Project khởi động cho board **WeAct Studio STM32H523CET6**, nạp và debug bằng **SEGGER J-Link**.
 
-What it does: blinks an LED at 1 Hz and prints logs through `printf()`. Logs can go out over **UART1** or **SEGGER RTT** — pick one by switching build configuration, not by editing code.
+Nội dung: nháy LED 1 Hz và in log qua `printf()`. Log có thể đi ra **UART1** hoặc **SEGGER RTT** — chọn bằng cách đổi build configuration, không phải sửa code.
+
+📖 **Bản hướng dẫn đầy đủ (song ngữ VI/EN):** <https://vuxtechsolution.com/projects/stm32h5-blink-jlink/>
+Dự án tiếp theo cùng board: [ST7789 + TouchGFX](../ST7789/README.md) · <https://vuxtechsolution.com/projects/stm32h5-st7789-touchgfx/>
 
 ---
 
-## 1. Hardware
+## 1. Phần cứng
 
 ### Board
 
@@ -14,27 +17,27 @@ What it does: blinks an LED at 1 Hz and prints logs through `printf()`. Logs can
 |---|---|
 | MCU | STM32H523CETx — Cortex-M33, LQFP48, 512 KB Flash / 272 KB RAM |
 | SYSCLK | 250 MHz (HSE 8 MHz → PLL1: M=1, N=62, FRACN=4096, P=2) |
-| Crystals | HSE 8 MHz (PH0/PH1) · LSE 32.768 kHz (PC14/PC15) |
-| LED | **PC13**, active-low (write `0` = on) |
-| KEY button | PA0, active-low + pull-up (unused in this project) |
+| Thạch anh | HSE 8 MHz (PH0/PH1) · LSE 32.768 kHz (PC14/PC15) |
+| LED | **PC13**, active-low (ghi `0` = sáng) |
+| Nút KEY | PA0, active-low + pull-up (chưa dùng trong project này) |
 | Debug | SWD — PA13 (SWDIO) / PA14 (SWCLK) |
 | Log UART | **USART1 — PB14 (TX) / PB15 (RX)**, 115200 8-N-1 |
 
-> The LED and KEY pins come from Zephyr's `blackpill_h523ce` board definition. Some WeAct production batches move pins around — if the LED doesn't blink, cross-check against the schematic for the exact batch you have.
+> Chân LED và KEY tham chiếu từ định nghĩa board `blackpill_h523ce` của Zephyr. Vài lô board WeAct có đổi chân — nếu LED không nháy, đối chiếu lại với schematic của đúng lô board bạn cầm.
 
-### J-Link wiring (SWD)
+### Nối J-Link (SWD)
 
-| J-Link 20-pin | Board | Required |
+| J-Link 20-pin | Board | Bắt buộc |
 |---|---|---|
-| 1 — VTref | 3V3 | ✅ J-Link uses it to sense logic level, it does **not** supply power |
+| 1 — VTref | 3V3 | ✅ J-Link dùng để đo mức logic, **không** cấp nguồn |
 | 4 — GND | GND | ✅ |
 | 7 — SWDIO | PA13 (DIO) | ✅ |
 | 9 — SWCLK | PA14 (CLK) | ✅ |
-| 15 — RESET | NRST | Recommended — saves you when the chip enters low-power |
+| 15 — RESET | NRST | Nên nối — cứu khi chip vào low-power |
 
-Power the board from its own **USB-C** cable; don't take 3.3 V from the J-Link.
+Cấp nguồn cho board bằng cáp **USB-C** riêng, đừng lấy 3.3V từ J-Link.
 
-### USB-TTL wiring — only needed for `Debug_UART`
+### Nối USB-TTL — chỉ cần cho `Debug_UART`
 
 | Board | USB-TTL |
 |---|---|
@@ -42,7 +45,7 @@ Power the board from its own **USB-C** cable; don't take 3.3 V from the J-Link.
 | **PB15** — USART1_RX | TXD |
 | GND | GND |
 
-TX goes to RX and vice versa. GND must be common.
+TX nối vào RX và ngược lại. GND phải nối chung.
 
 ---
 
@@ -54,13 +57,13 @@ TX goes to RX and vice versa. GND must be common.
 | STM32CubeIDE | 2.2.0 |
 | SEGGER J-Link | Software pack + RTT V7.94e |
 
-As of **STM32CubeIDE 2.0.0**, ST split CubeMX out of the IDE. The `File → New → STM32 Project` menu no longer exists. Projects are created and configured in standalone CubeMX, then imported into the IDE.
+Từ **STM32CubeIDE 2.0.0**, ST đã tách CubeMX ra khỏi IDE. Menu `File → New → STM32 Project` không còn tồn tại. Project được tạo và cấu hình bằng CubeMX standalone, rồi import vào IDE.
 
 ---
 
-## 3. `.ioc` configuration
+## 3. Cấu hình `.ioc`
 
-| Item | Value |
+| Mục | Giá trị |
 |---|---|
 | SYS → Debug | Serial Wire |
 | SYS → Timebase | SysTick |
@@ -69,25 +72,25 @@ As of **STM32CubeIDE 2.0.0**, ST split CubeMX out of the IDE. The `File → New 
 | Clock → HCLK | 250 MHz |
 | PC13 | GPIO_Output · level **High** · Push Pull · No pull · Low speed · **Label = `LED`** |
 | USART1 | Asynchronous · 115200 · 8 bit · None · 1 stop |
-| ICACHE | Enabled, 1-way |
+| ICACHE | Bật, 1-way |
 | Project Manager | Toolchain = **STM32CubeIDE** · **Generate Under Root** ✔ · Structure = Advanced |
 
-`GPIO output level = High` because the LED is active-low — this keeps it off at startup.
+`GPIO output level = High` là vì LED active-low — để LED tắt lúc khởi động.
 
 ---
 
 ## 4. Build configurations
 
-| Configuration | `printf()` backend | Define | `Core/RTT` |
+| Configuration | Backend của `printf()` | Define | `Core/RTT` |
 |---|---|---|---|
 | `Debug_UART` | USART1 @ 115200 (PB14) | `LOG_BACKEND_UART` | Exclude from Build |
-| `Debug_RTT` | SEGGER RTT over SWD | `LOG_BACKEND_RTT`, `RTT_USE_ASM=0` | Compiled |
+| `Debug_RTT` | SEGGER RTT qua SWD | `LOG_BACKEND_RTT`, `RTT_USE_ASM=0` | Biên dịch |
 
-Switch backend with `right-click project → Build Configurations → Set Active`. Not a single line of code changes.
+Đổi backend = `chuột phải project → Build Configurations → Set Active`. Code không đổi một dòng nào.
 
-`Debug_RTT` additionally has the include path `../Core/RTT`.
+`Debug_RTT` có thêm include path `../Core/RTT`.
 
-### Layout
+### Cấu trúc
 
 ```
 H523_Blink/
@@ -95,20 +98,20 @@ H523_Blink/
 │   ├── Inc/          # main.h, stm32h5xx_hal_conf.h, stm32h5xx_it.h
 │   ├── Src/          # main.c, syscalls.c, ...
 │   ├── Startup/      # startup_stm32h523cetx.s
-│   └── RTT/          # SEGGER RTT — copied in by hand, see section 6
+│   └── RTT/          # SEGGER RTT — copy tay vào, xem mục 6
 │       ├── SEGGER_RTT.c
 │       ├── SEGGER_RTT.h
 │       └── SEGGER_RTT_Conf.h
-├── Drivers/          # HAL + CMSIS (generated by CubeMX)
-├── H523_Blink.ioc    # source of truth for the hardware configuration
+├── Drivers/          # HAL + CMSIS (CubeMX sinh ra)
+├── H523_Blink.ioc    # nguồn sự thật cho cấu hình phần cứng
 └── STM32H523CETX_FLASH.ld
 ```
 
-`Core` is already a source folder, so `Core/RTT` is compiled automatically — no extra declaration needed.
+`Core` đã là source folder nên `Core/RTT` được biên dịch tự động — không cần khai báo thêm.
 
-### How the code picks a backend
+### Cách code chọn backend
 
-In `Core/Src/main.c`, inside a `USER CODE` block:
+Trong `Core/Src/main.c`, vùng `USER CODE`:
 
 ```c
 int __io_putchar(int ch)
@@ -122,52 +125,52 @@ int __io_putchar(int ch)
 }
 ```
 
-newlib's `printf()` calls down into `_write()` in `Core/Src/syscalls.c`, and `_write()` calls `__io_putchar()`. Overriding that one function is enough to redirect all of `printf`.
+`printf()` của newlib gọi xuống `_write()` trong `Core/Src/syscalls.c`, `_write()` gọi `__io_putchar()`. Đè hàm đó là đủ để chuyển hướng toàn bộ `printf`.
 
-If you create a new configuration and forget to define a backend, the build stops right at the `#error` in `USER CODE BEGIN PD` — deliberately, so it can't silently fall through to the UART branch.
+Nếu tạo configuration mới mà quên define backend, build sẽ dừng ngay ở `#error` trong `USER CODE BEGIN PD` — chủ ý, để không âm thầm rơi vào nhánh UART.
 
 ---
 
-## 5. Workflow
+## 5. Quy trình làm việc
 
-### Changing the hardware configuration
+### Sửa cấu hình phần cứng
 
-1. Open `H523_Blink.ioc` in **standalone CubeMX**
-2. Make your changes, and verify Project Manager is still `STM32CubeIDE` + `Generate Under Root`
+1. Mở `H523_Blink.ioc` bằng **CubeMX standalone**
+2. Sửa, kiểm tra Project Manager vẫn là `STM32CubeIDE` + `Generate Under Root`
 3. **GENERATE CODE**
-4. Back in CubeIDE, select the project and press **F5** — CubeIDE 2.0 doesn't refresh the file tree on its own
+4. Về CubeIDE, chọn project, nhấn **F5** — CubeIDE 2.0 chưa tự refresh cây file
 
-> ⚠️ **Commit to git before every generate.** CubeMX overwrites `.cproject` and **both build configurations disappear**. After generating, run `git diff .cproject` to see exactly what was lost, then restore it.
+> ⚠️ **Commit git trước mỗi lần generate.** CubeMX ghi đè `.cproject` và **hai build configuration sẽ biến mất**. Sau khi generate, chạy `git diff .cproject` để thấy ngay cái gì mất, rồi khôi phục.
 
-### Build & flash
+### Build & nạp
 
-`Run → Debug Configurations…` → **Debugger** tab:
+`Run → Debug Configurations…` → tab **Debugger**:
 
-| Item | Value |
+| Mục | Giá trị |
 |---|---|
-| Debug probe | **SEGGER J-LINK** (defaults to ST-LINK — must be changed) |
+| Debug probe | **SEGGER J-LINK** (mặc định là ST-LINK — phải đổi) |
 | Interface | SWD |
 | Device name | `STM32H523CE` |
-| Speed | 4000 kHz (drop to 1000 if flaky) |
+| Speed | 4000 kHz (chập chờn thì hạ 1000) |
 | Reset behaviour | Connect under reset |
 
-**Main** tab, so that one launch config serves both build configurations:
+Tab **Main**, để một launch config dùng chung cho cả hai build configuration:
 
 - C/C++ Application: `${config_name:H523_Blink}/H523_Blink.elf`
 - Build Configuration: **Use Active**
 
-### Viewing logs — `Debug_UART`
+### Xem log — `Debug_UART`
 
-`Window → Show View → Terminal` → **Open a Terminal** → Serial Terminal → the USB-TTL's COM port, **115200 8-N-1**.
+`Window → Show View → Terminal` → **Open a Terminal** → Serial Terminal → COM port của USB-TTL, **115200 8-N-1**.
 
-### Viewing logs — `Debug_RTT`
+### Xem log — `Debug_RTT`
 
-No wires beyond SWD.
+Không cần dây nào ngoài SWD.
 
-- **Usual way:** hit Debug in CubeIDE first, then open **J-Link RTT Viewer** → Connection = **Existing Session**.
+- **Cách thường dùng:** bấm Debug trong CubeIDE trước, rồi mở **J-Link RTT Viewer** → Connection = **Existing Session**.
 - **Standalone:** Target Device `STM32H523CE`, SWD 4000 kHz, RTT Control Block = Auto Detection.
 
-Expected output:
+Output mong đợi:
 
 ```
 ==========================================
@@ -183,11 +186,11 @@ Blink #2  ->  LED OFF
 
 ---
 
-## 6. Rebuilding from scratch
+## 6. Dựng lại từ đầu
 
-Needed after a fresh clone, or after CubeMX wipes out the build configurations.
+Cần khi clone mới, hoặc sau khi CubeMX xoá mất build configuration.
 
-**1. Copy the SEGGER RTT sources** (if `Core/RTT/` isn't in the repo)
+**1. Copy source SEGGER RTT** (nếu `Core/RTT/` chưa có trong repo)
 
 ```bash
 mkdir -p Core/RTT
@@ -197,73 +200,73 @@ cp ~/gitwork/segger_rtt/SEGGER_RTT_V794e/RTT/SEGGER_RTT.c \
    Core/RTT/
 ```
 
-Do not copy `SEGGER_RTT_ASM_ARMv7M.S` — see section 7.
+Không copy `SEGGER_RTT_ASM_ARMv7M.S` — xem mục 7.
 
-**2. Import into CubeIDE** — use **exactly** this menu:
+**2. Import vào CubeIDE** — dùng **đúng** menu này:
 
 ```
 File → STM32 Project Create/Import
      → Import STM32 Project
      → STM32CubeMX/STM32CubeIDE Project → Next
-     → point at the project directory → Finish
+     → trỏ tới thư mục project → Finish
 ```
 
-**3. Create the two configurations**
+**3. Tạo hai configuration**
 
-`Right-click project → Build Configurations → Manage…`
+`Chuột phải project → Build Configurations → Manage…`
 
 - Rename `Debug` → `Debug_UART`
 - New… → `Debug_RTT`, copy settings from `Debug_UART`
 
-**4. Set each one up**
+**4. Thiết lập từng cái**
 
-`Properties → C/C++ Build → Settings` — select the correct **Configuration** in the dropdown at the top *before* changing anything.
+`Properties → C/C++ Build → Settings` — chọn đúng **Configuration** ở dropdown trên đầu trước khi sửa bất cứ gì.
 
 | Configuration | MCU/MPU GCC Compiler → Define symbols | → Include paths |
 |---|---|---|
 | `Debug_UART` | `LOG_BACKEND_UART` | — |
 | `Debug_RTT` | `LOG_BACKEND_RTT`, `RTT_USE_ASM=0` | `../Core/RTT` |
 
-**5. Exclude RTT from the UART build**
+**5. Loại RTT khỏi bản UART**
 
-Set active = `Debug_UART`, then `right-click Core/RTT → Resource Configurations → Exclude from Build…` → tick `Debug_UART`, untick `Debug_RTT`.
-
----
-
-## 7. Traps hit along the way
-
-**The Build button (the hammer) is greyed out after import.**
-The project lost its C/C++ nature because it was imported via `File → Import → General → Existing Projects into Workspace` or `Open Projects from File System`. Both of those import it as a *general project*. You must use `File → STM32 Project Create/Import`. Quick check: the project directory must contain the hidden `.cproject` file, and `Core`/`Drivers` must show a folder icon with a purple **C**.
-
-**Link error `undefined reference to SEGGER_RTT_ASM_WriteSkipNoLock`.**
-`SEGGER_RTT.h` turns on `RTT_USE_ASM=1` by itself when it detects a Cortex-M33 and switches to calling the assembly routines. But `SEGGER_RTT_ASM_ARMv7M.S` **does not include** `SEGGER_RTT.h` — it only emits code when `RTT_USE_ASM` is defined on the **assembler** command line, so the file assembles to nothing. The clean fix: define `RTT_USE_ASM=0` and drop the `.S` file entirely. The pure-C version is still far faster than UART.
-
-**Settings landing in the wrong configuration.**
-`Properties → C/C++ Build → Settings` has a **Configuration** dropdown at the top. Forget to change it and your settings go into whichever config is currently active, with no warning.
-
-**RTT Viewer has no `STM32H523CE` in its device list.**
-The J-Link software is older than the chip. Use **Existing Session** (the device field is disabled), or pick `Cortex-M33` (manufacturer *Unspecified*) + RTT Control Block = **Search Range** `0x20000000 0x44000` (the H523's 272 KB SRAM). For a permanent fix, update the J-Link software.
-
-**Code disappears after regenerating.**
-Only write between the `/* USER CODE BEGIN x */` … `/* USER CODE END x */` pairs. Everything outside them is deleted by CubeMX. To recover: `right-click file → Compare With → Local History…`
-
-**`printf("%f")` prints garbage.**
-newlib-nano has float support disabled. Re-enable it with the `-u _printf_float` flag under `MCU/MPU GCC **Linker** → Miscellaneous → Other flags`. This is a **linker** flag — put it on the Compiler and gcc accepts it and ignores it, with no effect.
+Set active = `Debug_UART`, rồi `chuột phải Core/RTT → Resource Configurations → Exclude from Build…` → tick `Debug_UART`, bỏ tick `Debug_RTT`.
 
 ---
 
-## 8. Appendix — SWV / ITM (unused)
+## 7. Bẫy đã gặp
 
-CubeIDE also has an SWV/ITM Console and it does work with J-Link, but it needs an extra wire, **PB3 (TRACESWO) → J-Link pin 13**, plus a third build configuration with a `LOG_BACKEND_SWO` define, `ITM_SendChar()` in `__io_putchar()`, and `DBGMCU_CR_TRACE_IOEN | DBGMCU_CR_TRACE_CLKEN` enabled by hand (the J-Link DLL doesn't know the STM32H523, so it won't run the trace-init sequence itself).
+**Nút Build (cái búa) bị làm mờ sau khi import.**
+Project mất C/C++ nature vì import bằng `File → Import → General → Existing Projects into Workspace` hoặc `Open Projects from File System`. Hai đường đó import thành *general project*. Phải dùng `File → STM32 Project Create/Import`. Kiểm tra nhanh: thư mục project phải có file ẩn `.cproject`, và `Core`/`Drivers` phải hiện icon thư mục kèm chữ **C** màu tím.
 
-For plain `printf` needs, RTT wins outright: faster, no pins used, no wires, and no dependence on whether the core clock is declared correctly. SWV is only worth turning on when you need **Exception Trace**, **Data Trace** or **Statistical Profiling** — things RTT can't do.
+**Link lỗi `undefined reference to SEGGER_RTT_ASM_WriteSkipNoLock`.**
+`SEGGER_RTT.h` tự bật `RTT_USE_ASM=1` khi thấy Cortex-M33 và chuyển sang gọi hàm assembly. Nhưng `SEGGER_RTT_ASM_ARMv7M.S` **không include** `SEGGER_RTT.h` — nó chỉ sinh code khi `RTT_USE_ASM` được define trên dòng lệnh **assembler**, nên file assemble ra rỗng. Cách gọn: define `RTT_USE_ASM=0` và bỏ hẳn file `.S`. Bản C thuần vẫn nhanh hơn UART rất nhiều.
+
+**Thiết lập rơi nhầm configuration.**
+Trong `Properties → C/C++ Build → Settings` có dropdown **Configuration** ở trên đầu. Quên đổi nó là thiết lập rơi vào config đang active, và không có gì cảnh báo.
+
+**RTT Viewer không có `STM32H523CE` trong danh sách device.**
+Bản J-Link software cũ hơn con chip. Dùng **Existing Session** (ô device bị vô hiệu), hoặc chọn `Cortex-M33` (hãng *Unspecified*) + RTT Control Block = **Search Range** `0x20000000 0x44000` (272 KB SRAM của H523). Muốn triệt để thì update J-Link software.
+
+**Code biến mất sau khi generate lại.**
+Chỉ viết giữa các cặp `/* USER CODE BEGIN x */` … `/* USER CODE END x */`. Mọi thứ ngoài đó bị CubeMX xoá. Khôi phục: `chuột phải file → Compare With → Local History…`
+
+**`printf("%f")` in ra rác.**
+Newlib-nano tắt hỗ trợ float. Bật lại bằng flag `-u _printf_float` ở `MCU/MPU GCC **Linker** → Miscellaneous → Other flags`. Đây là flag của **linker**, đặt ở Compiler thì gcc nhận rồi bỏ qua, không có tác dụng gì.
 
 ---
 
-## References
+## 8. Phụ lục — SWV / ITM (chưa dùng)
 
-- [Zephyr — Black Pill STM32H523](https://docs.zephyrproject.org/latest/boards/weact/blackpill_h523ce/doc/index.html) — LED, KEY and HSE pins
+CubeIDE cũng có SWV/ITM Console và nó chạy được với J-Link, nhưng cần thêm dây **PB3 (TRACESWO) → J-Link chân 13**, cộng thêm build configuration thứ ba với define `LOG_BACKEND_SWO`, `ITM_SendChar()` trong `__io_putchar()`, và bật `DBGMCU_CR_TRACE_IOEN | DBGMCU_CR_TRACE_CLKEN` bằng tay (vì J-Link DLL chưa biết STM32H523 nên không tự chạy trình tự trace-init).
+
+Với nhu cầu `printf` thuần thì RTT hơn hẳn: nhanh hơn, không tốn chân, không tốn dây, không phụ thuộc khai báo core clock đúng hay sai. SWV chỉ đáng bật khi cần **Exception Trace**, **Data Trace** hoặc **Statistical Profiling** — những thứ RTT không làm được.
+
+---
+
+## Tham khảo
+
+- [Zephyr — Black Pill STM32H523](https://docs.zephyrproject.org/latest/boards/weact/blackpill_h523ce/doc/index.html) — chân LED, KEY, HSE
 - [WeActStudio.STM32H523CoreBoard](https://github.com/WeActStudio/WeActStudio.STM32H523CoreBoard/) — schematic
-- [STM32CubeIDE 2.0.0 workflow tutorial](https://community.st.com/t5/stm32-mcus/stm32cubeide-2-0-0-workflow-tutorial/ta-p/864831) — the new import flow
-- [What's new in STM32CubeIDE 2.0.0](https://community.st.com/t5/developer-news/what-s-new-in-stm32cubeide-2-0-0/ba-p/856658) — the CubeMX split
+- [STM32CubeIDE 2.0.0 workflow tutorial](https://community.st.com/t5/stm32-mcus/stm32cubeide-2-0-0-workflow-tutorial/ta-p/864831) — quy trình import mới
+- [What's new in STM32CubeIDE 2.0.0](https://community.st.com/t5/developer-news/what-s-new-in-stm32cubeide-2-0-0/ba-p/856658) — tách CubeMX
 - [J-Link RTT Viewer — SEGGER KB](https://kb.segger.com/J-Link_RTT_Viewer)
