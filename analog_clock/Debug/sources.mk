@@ -42,6 +42,15 @@ Core/Src \
 Core/Startup \
 Drivers/STM32H5xx_HAL_Driver/Src \
 TouchGFX/App \
+TouchGFX/generated/fonts/src \
+TouchGFX/generated/gui_generated/src/common \
+TouchGFX/generated/gui_generated/src/main_screen \
+TouchGFX/generated/images/src \
+TouchGFX/generated/images/src/__generated \
+TouchGFX/generated/texts/src \
+TouchGFX/gui/src/common \
+TouchGFX/gui/src/main_screen \
+TouchGFX/gui/src/model \
 TouchGFX/target \
 TouchGFX/target/generated \
 

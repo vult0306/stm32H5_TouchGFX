@@ -11,6 +11,15 @@ RM := rm -rf
 -include sources.mk
 -include TouchGFX/target/generated/subdir.mk
 -include TouchGFX/target/subdir.mk
+-include TouchGFX/gui/src/model/subdir.mk
+-include TouchGFX/gui/src/main_screen/subdir.mk
+-include TouchGFX/gui/src/common/subdir.mk
+-include TouchGFX/generated/texts/src/subdir.mk
+-include TouchGFX/generated/images/src/__generated/subdir.mk
+-include TouchGFX/generated/images/src/subdir.mk
+-include TouchGFX/generated/gui_generated/src/main_screen/subdir.mk
+-include TouchGFX/generated/gui_generated/src/common/subdir.mk
+-include TouchGFX/generated/fonts/src/subdir.mk
 -include TouchGFX/App/subdir.mk
 -include Drivers/STM32H5xx_HAL_Driver/Src/subdir.mk
 -include Core/Startup/subdir.mk
@@ -88,7 +97,7 @@ main-build: analog_clock.elf secondary-outputs
 
 # Tool invocations
 analog_clock.elf analog_clock.map: $(OBJS) $(USER_OBJS) /home/vle/gitwork/stm32H5_TouchGFX/analog_clock/STM32H523CETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-g++ -o "analog_clock.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m33 -T"/home/vle/gitwork/stm32H5_TouchGFX/analog_clock/STM32H523CETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="analog_clock.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
+	arm-none-eabi-g++ -o "analog_clock.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m33 -T"/home/vle/gitwork/stm32H5_TouchGFX/analog_clock/STM32H523CETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="analog_clock.map" -Wl,--gc-sections -static -L"/home/vle/gitwork/stm32H5_TouchGFX/analog_clock/Middlewares/ST/touchgfx/lib/core/cortex_m33/gcc" --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -lstdc++ -lsupc++ -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
