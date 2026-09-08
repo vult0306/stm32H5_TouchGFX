@@ -12,7 +12,7 @@ mainViewBase::mainViewBase()
     add(__background);
 
     bg.setPosition(0, 0, 240, 240);
-    bg.setColor(touchgfx::Color::getColorFromRGB(255, 255, 255));
+    bg.setColor(touchgfx::Color::getColorFromRGB(63, 87, 55));
     add(bg);
 
     analogClock1.setXY(0, 0);
