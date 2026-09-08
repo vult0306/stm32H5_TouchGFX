@@ -11,7 +11,9 @@ public:
     virtual ~mainView() {}
     virtual void setupScreen();
     virtual void tearDownScreen();
+    virtual void handleTickEvent();
 protected:
+    uint8_t lastSecond;
 };
 
 #endif // MAINVIEW_HPP

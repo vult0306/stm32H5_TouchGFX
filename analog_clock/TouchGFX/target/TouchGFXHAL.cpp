@@ -21,6 +21,7 @@
 /* USER CODE END Header */
 
 #include <TouchGFXHAL.hpp>
+#include <platform/driver/lcd/LCD16bpp.hpp>
 
 /* USER CODE BEGIN TouchGFXHAL.cpp */
 
@@ -48,6 +49,11 @@ void TouchGFXHAL::initialize()
     // Please note, HAL::initialize() must be called to initialize the framework.
 
     TouchGFXGeneratedHAL::initialize();
+
+    // TouchGFX links the texture-mapper scan-line renderers on demand: every
+    // entry in LCD16bpp's table is null until enabled, so rotated widgets
+    // (the AnalogClock hands) silently draw nothing. The hands are ARGB8888.
+    static_cast<touchgfx::LCD16bpp&>(lcd()).enableTextureMapperARGB8888();
 }
 
 /**
