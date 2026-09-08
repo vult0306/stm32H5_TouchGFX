@@ -23,6 +23,10 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "st7789.h"
+#include <stdio.h>
+#if defined(LOG_BACKEND_RTT)
+  #include "SEGGER_RTT.h"
+#endif
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -32,7 +36,15 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#if   defined(LOG_BACKEND_RTT)
+  #define LOG_BACKEND_NAME "SEGGER RTT"
+#elif defined(LOG_BACKEND_SWO)
+  #define LOG_BACKEND_NAME "SWV / ITM port 0"
+#elif defined(LOG_BACKEND_UART)
+  #define LOG_BACKEND_NAME "USART1 @ 115200"
+#else
+  #error "Chua chon backend: define LOG_BACKEND_RTT / _SWO / _UART"
+#endif
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -73,6 +85,19 @@ static void MX_RTC_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 extern void touchgfxSignalVSync(void);
+
+/* printf() -> _write() -> __io_putchar() -> backend */
+int __io_putchar(int ch)
+{
+#if   defined(LOG_BACKEND_RTT)
+  SEGGER_RTT_PutChar(0, (char)ch);
+#elif defined(LOG_BACKEND_SWO)
+  ITM_SendChar((uint32_t)ch);
+#else
+  HAL_UART_Transmit(&huart1, (uint8_t *)&ch, 1, HAL_MAX_DELAY);
+#endif
+  return ch;
+}
 /* USER CODE END 0 */
 
 /**
@@ -119,6 +144,20 @@ int main(void)
   MX_TouchGFX_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim6);
+
+#if defined(LOG_BACKEND_RTT)
+  SEGGER_RTT_Init();
+#endif
+
+  setvbuf(stdout, NULL, _IONBF, 0);   /* tat buffer: printf ra ngay lap tuc */
+
+  printf("\r\n==========================================\r\n");
+  printf("  Hello World from STM32H523CET6!\r\n");
+  printf("  Backend: %s\r\n", LOG_BACKEND_NAME);
+  printf("  SYSCLK : %lu Hz\r\n", (unsigned long)HAL_RCC_GetSysClockFreq());
+  printf("  HCLK   : %lu Hz\r\n", (unsigned long)HAL_RCC_GetHCLKFreq());
+  printf("  Build  : %s %s\r\n", __DATE__, __TIME__);
+  printf("==========================================\r\n\n");
   /* USER CODE END 2 */
 
   /* Infinite loop */
