@@ -21,9 +21,9 @@
 /* USER CODE END Header */
 
 #include <TouchGFXHAL.hpp>
-#include <platform/driver/lcd/LCD16bpp.hpp>
 
 /* USER CODE BEGIN TouchGFXHAL.cpp */
+#include <platform/driver/lcd/LCD16bpp.hpp>
 
 using namespace touchgfx;
 

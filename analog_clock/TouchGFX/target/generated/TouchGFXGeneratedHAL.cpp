@@ -53,8 +53,6 @@ void TouchGFXGeneratedHAL::initialize()
 {
     HAL::initialize();
     registerEventListener(*(Application::getInstance()));
-    enableLCDControllerInterrupt();
-    enableInterrupts();
     // Partial framebuffer strategy
     setFrameBufferAllocator(&blockAllocator);
     if (!setFrameRefreshStrategy(HAL::REFRESH_STRATEGY_PARTIAL_FRAMEBUFFER))
@@ -92,7 +90,6 @@ void TouchGFXGeneratedHAL::endFrame()
     while (touchgfxDisplayDriverTransmitActive()){}
 
     HAL::endFrame();
-    touchgfx::OSWrappers::signalRenderingDone();
 }
 
 inline uint8_t* TouchGFXGeneratedHAL::advanceFrameBufferToRect(uint8_t* fbPtr, const touchgfx::Rect& rect) const

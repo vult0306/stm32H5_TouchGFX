@@ -43,8 +43,10 @@ extern "C" {
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
-void MX_TouchGFX_Init(void);
+void MX_TouchGFX_PreOSInit(void);
+UINT MX_TouchGFX_Init(VOID* memory_ptr);
 void MX_TouchGFX_Process(void);
+void TouchGFX_Task(unsigned long thread_input);
 
 /* USER CODE BEGIN EFP */
 
